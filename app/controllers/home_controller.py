@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_user, login_required, logout_user, current_user
 from models.user import User
+from models.perro import Perro
 from config.auth import login_manager
+
 
 @login_manager.user_loader
 def load_user(id:int):
@@ -33,13 +35,34 @@ def auth():
 @home_blueprint.route('/auth/profile') 
 @login_required
 def auth_profile():
-    if current_user.es_admin=="1":
+    if current_user.es_admin == True:
         permisos = "Administrador"
     else: permisos ="usuario"   
     
     if current_user.genero=="Masculino":
         usuario = "Bienvenido"
     else: usuario ="Bienvenida"   
+
+    return f'{usuario}: {current_user.username} eres: {permisos}'
+
+@home_blueprint.route('/auth/perros') 
+@login_required
+def auth_perros():
+    if current_user.genero=="Masculino":
+        usuario = "Bienvenido"
+    else: usuario ="Bienvenida"  
+    
+    if current_user.es_admin == True:
+        permisos = "Administrador"
+        perros = Perro.query.all()
+        return render_template("perros_todos.html", perros = perros)
+    else: 
+        permisos ="usuario"  
+        return f'{usuario}: {current_user.username} eres: {permisos}' 
+    
+
+
+
 
     return f'{usuario}: {current_user.username} eres: {permisos}'
 
